@@ -1,11 +1,11 @@
 const CACHE_NAME = 'budget-tracker-v1';
 const DATA_CACHE_NAME = 'budget-cache-v1';
 const FILES_TO_CACHE = [
-    "/",
-    "/index.html",
-    "/manifest.webmanifest",
-    "/js/index.js",
-    "/css/styles.css",
+    '/',
+    '/index.html',
+    '/manifest.webmanifest',
+    '/js/index.js',
+    '/css/styles.css',
     '/icons/icon-72x72.png',
     '/icons/icon-96x96.png',
     '/icons/icon-128x128.png',
