@@ -19,50 +19,82 @@ const FILES_TO_CACHE = [
 
 
 //Install service worker
-self.addEventListener('install', function(evt) {
-    evt.waitUntil(
-        caches
-        .open(CACHE_NAME)
-        .then((cache) => cache.addAll(FILES_TO_CACHE))
-        .then(self.skipWaiting())
-    );
-});
-
-//Activate service worker and remove old data from cache
-// self.addEventListener('activate', function(evt) {
+// self.addEventListener('install', function(evt) {
 //     evt.waitUntil(
 //         caches
-//         .keys()
-//         .then(keyList => {
-//           return Promise.all(
-//             keyList.map(key => {
-//               if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
-//                 console.log("Removing old cache data", key);
-//                 return caches.delete(key);
-//               }
-//             })
-//           );
-//         })
+//         .open(CACHE_NAME)
+//         .then((cache) => cache.addAll(FILES_TO_CACHE))
+//         .then(self.skipWaiting())
 //     );
-//     self.clients.claim();
+// });
+self.addEventListener('install', function(evt) {
+  evt.waitUntil(
+      caches.open(CACHE_NAME).then(cache => {
+          console.log('Your files were pre-cached successfully!');
+          return cache.addAll(FILES_TO_CACHE);
+      })
+  );
+  self.skipWaiting();
+});
+
+
+//Activate service worker and remove old data from cache
+self.addEventListener('activate', function(evt) {
+    evt.waitUntil(
+        caches
+        .keys()
+        .then(keyList => {
+          return Promise.all(
+            keyList.map(key => {
+              if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+                console.log("Removing old cache data", key);
+                return caches.delete(key);
+              }
+            })
+          );
+        })
+    );
+    self.clients.claim();
+});
+
+// self.addEventListener('activate', function(evt) {
+//   evt.waitUntil(
+//     caches.keys().then(function(keyList) {
+//       let cacheKeeplist = keyList.filter(function(key) {
+//         return key.indexOf(APP_PREFIX);
+//       });
+//       cacheKeeplist.push(CACHE_NAME);
+
+//       return Promise.all(
+//         keyList.map(function(key, i) {
+//           if (cacheKeeplist.indexOf(key) === -1) {
+//             console.log('deleting cache : ' + keyList[i]);
+//             return caches.delete(keyList[i]);
+//           }
+//         })
+//       );
+//     })
+//   );
 // });
 
-self.addEventListener('activate', function(event) {
 
-  var cacheAllowlist = ['budget-tracker-v1', 'budget-cache-v1'];
 
-  event.waitUntil(
-    caches.keys().then(function(cacheNames) {
-      return Promise.all(
-        cacheNames.map(function(cacheName) {
-          if (cacheAllowlist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-});
+// self.addEventListener('activate', function(event) {
+
+//   var cacheAllowlist = ['budget-tracker-v1', 'budget-cache-v1'];
+
+//   event.waitUntil(
+//     caches.keys().then(function(cacheNames) {
+//       return Promise.all(
+//         cacheNames.map(function(cacheName) {
+//           if (cacheAllowlist.indexOf(cacheName) === -1) {
+//             return caches.delete(cacheName);
+//           }
+//         })
+//       );
+//     })
+//   );
+// });
 
 
 //Fetch request interception
@@ -92,27 +124,27 @@ self.addEventListener('fetch', function(evt) {
     return;
     }
   
-    // evt.respondWith(
-    //   caches
-    //   .open(CACHE_NAME)
-    //   .then(cache => {
-    //     return cache.match(evt.request).then(response => {
-    //       return response || fetch(evt.request);
-    //     });
-    //   })
-    // );
-
     evt.respondWith(
-      fetch(evt.request).catch(function() {
-        return caches.match(evt.request).then(function(response) {
-          if (response) {
-            return response;
-          } else if (evt.request.headers.get('accept').includes('text/html')) {
-            return caches.match('/');
-          }
+      caches
+      .open(CACHE_NAME)
+      .then(cache => {
+        return cache.match(evt.request).then(response => {
+          return response || fetch(evt.request);
         });
       })
     );
+
+    // evt.respondWith(
+    //   fetch(evt.request).catch(function() {
+    //     return caches.match(evt.request).then(function(response) {
+    //       if (response) {
+    //         return response;
+    //       } else if (evt.request.headers.get('accept').includes('text/html')) {
+    //         return caches.match('/');
+    //       }
+    //     });
+    //   })
+    // );
 }); 
 
 
