@@ -39,23 +39,23 @@ self.addEventListener('install', function(evt) {
 
 
 //Activate service worker and remove old data from cache
-self.addEventListener('activate', function(evt) {
-    evt.waitUntil(
-        caches
-        .keys()
-        .then(keyList => {
-          return Promise.all(
-            keyList.map(key => {
-              if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
-                console.log("Removing old cache data", key);
-                return caches.delete(key);
-              }
-            })
-          );
-        })
-    );
-    self.clients.claim();
-});
+// self.addEventListener('activate', function(evt) {
+//     evt.waitUntil(
+//         caches
+//         .keys()
+//         .then(keyList => {
+//           return Promise.all(
+//             keyList.map(key => {
+//               if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+//                 console.log("Removing old cache data", key);
+//                 return caches.delete(key);
+//               }
+//             })
+//           );
+//         })
+//     );
+//     self.clients.claim();
+// });
 
 // self.addEventListener('activate', function(evt) {
 //   evt.waitUntil(
@@ -77,24 +77,22 @@ self.addEventListener('activate', function(evt) {
 //   );
 // });
 
+self.addEventListener('activate', function(event) {
 
+  var cacheAllowlist = ['budget-tracker-v1', 'budget-cache-v1'];
 
-// self.addEventListener('activate', function(event) {
-
-//   var cacheAllowlist = ['budget-tracker-v1', 'budget-cache-v1'];
-
-//   event.waitUntil(
-//     caches.keys().then(function(cacheNames) {
-//       return Promise.all(
-//         cacheNames.map(function(cacheName) {
-//           if (cacheAllowlist.indexOf(cacheName) === -1) {
-//             return caches.delete(cacheName);
-//           }
-//         })
-//       );
-//     })
-//   );
-// });
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheAllowlist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
 
 
 //Fetch request interception
