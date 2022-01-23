@@ -18,8 +18,8 @@ const FILES_TO_CACHE = [
 
 
 //Install service worker
-self.addEventListener('install', (event) => {
-    event.waitUntil(
+self.addEventListener('install', function(evt) {
+    evt.waitUntil(
         caches
         .open(CACHE_NAME)
         .then((cache) => cache.addAll(FILES_TO_CACHE))
